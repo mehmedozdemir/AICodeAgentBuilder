@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AI.CodeAgent.Builder.Application/AI.CodeAgent.Builder.Application.csproj" />
+    <Project Path="src/AI.CodeAgent.Builder.Domain/AI.CodeAgent.Builder.Domain.csproj" />
+    <Project Path="src/AI.CodeAgent.Builder.Infrastructure/AI.CodeAgent.Builder.Infrastructure.csproj" />
+    <Project Path="src/AI.CodeAgent.Builder.UI/AI.CodeAgent.Builder.UI.csproj" />
+  </Folder>
+</Solution>

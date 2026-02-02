@@ -1,0 +1,40 @@
+project:
+  name: AI.CodeAgent.Builder
+  type: desktop
+  ui: avalonia
+  language: csharp
+  dotnet: 8
+
+architecture:
+  style: clean
+  patterns:
+    - mvvm
+    - ddd
+    - solid
+
+persistence:
+  provider: sqlite
+  location: local
+
+ai:
+  role: knowledge_and_structure_generator
+  outputs:
+    - categories
+    - tech_stacks
+    - stack_parameters
+    - architecture_patterns
+  validation_required: true
+  audit_enabled: true
+
+generation:
+  templates:
+    engine: scriban
+  artifacts:
+    - copilot-instructions.md
+    - ai-agent-config
+    - engineering-policies
+    - contributing-guidelines
+
+governance:
+  hardcoded_data_allowed: false
+  external_calls_allowed: false
