@@ -1,8 +1,8 @@
 <Project>
   <PropertyGroup>
-    <Version>0.1.0</Version>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
+    <Version>0.2.0</Version>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
     <Authors>AI Code Agent Builder Team</Authors>
     <Company>AI Code Agent Builder</Company>
     <Product>AI Code Agent Builder</Product>
