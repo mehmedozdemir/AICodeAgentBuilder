@@ -1,0 +1,127 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AI.CodeAgent.Builder.UI.ViewModels"
+             x:Class="AI.CodeAgent.Builder.UI.Views.HomeView"
+             x:DataType="vm:HomeViewModel">
+
+    <Design.DataContext>
+        <vm:HomeViewModel />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="Button.action-card">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#e2e8f0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="30"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,0,20"/>
+        </Style>
+        <Style Selector="Button.action-card:pointerover">
+            <Setter Property="BorderBrush" Value="#2563eb"/>
+            <Setter Property="Background" Value="#eff6ff"/>
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="40" MaxWidth="800">
+            <!-- Welcome Header -->
+            <TextBlock Text="Welcome to AI Code Agent Builder"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="#1e293b"
+                       Margin="0,0,0,10"/>
+
+            <TextBlock Text="Generate AI instructions, configuration files, and engineering governance artifacts by selecting categorized technology stacks, architectures, and rules."
+                       FontSize="16"
+                       Foreground="#64748b"
+                       TextWrapping="Wrap"
+                       Margin="0,0,0,40"/>
+
+            <!-- Quick Actions -->
+            <TextBlock Text="Quick Actions"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       Foreground="#1e293b"
+                       Margin="0,0,0,20"/>
+
+            <!-- New Project Card -->
+            <Button Classes="action-card"
+                    Command="{Binding NewProjectCommand}">
+                <StackPanel>
+                    <TextBlock Text="🚀 Start New Project"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="#1e293b"
+                               Margin="0,0,0,10"/>
+                    <TextBlock Text="Create a new project profile by selecting technology stacks, architectures, and engineering rules. Generate copilot-instructions and configuration files."
+                               FontSize="14"
+                               Foreground="#64748b"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Button>
+
+            <!-- Manage Categories Card -->
+            <Button Classes="action-card"
+                    Command="{Binding ManageCategoriesCommand}">
+                <StackPanel>
+                    <TextBlock Text="📦 Manage Categories &amp; Stacks"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="#1e293b"
+                               Margin="0,0,0,10"/>
+                    <TextBlock Text="View and manage technology categories and stacks. Add custom entries or use AI to research and populate widely-used technologies."
+                               FontSize="14"
+                               Foreground="#64748b"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Button>
+
+            <!-- View History Card -->
+            <Button Classes="action-card"
+                    Command="{Binding ViewHistoryCommand}">
+                <StackPanel>
+                    <TextBlock Text="📜 View AI History"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="#1e293b"
+                               Margin="0,0,0,10"/>
+                    <TextBlock Text="Browse AI generation history, review prompts and responses, and analyze token usage statistics."
+                               FontSize="14"
+                               Foreground="#64748b"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Button>
+
+            <!-- Info Section -->
+            <Border Background="#fef3c7"
+                    BorderBrush="#fbbf24"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="0,20,0,0">
+                <StackPanel>
+                    <TextBlock Text="💡 Getting Started"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="#92400e"
+                               Margin="0,0,0,10"/>
+                    <TextBlock Text="1. Ensure categories and tech stacks are populated (use AI Refresh if needed)"
+                               FontSize="14"
+                               Foreground="#92400e"
+                               Margin="0,0,0,5"/>
+                    <TextBlock Text="2. Start a new project and follow the 5-step wizard"
+                               FontSize="14"
+                               Foreground="#92400e"
+                               Margin="0,0,0,5"/>
+                    <TextBlock Text="3. Review and generate your AI configuration artifacts"
+                               FontSize="14"
+                               Foreground="#92400e"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

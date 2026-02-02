@@ -1,20 +1,119 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AI.CodeAgent.Builder.UI.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:views="using:AI.CodeAgent.Builder.UI.Views"
         x:Class="AI.CodeAgent.Builder.UI.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
+        x:DataType="vm:MainViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="AI.CodeAgent.Builder.UI">
+        Title="AI Code Agent Builder"
+        Width="1400"
+        Height="900"
+        MinWidth="1200"
+        MinHeight="700">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
+        <vm:MainViewModel />
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Window.Styles>
+        <Style Selector="Button.nav-button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,15"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+        <Style Selector="Button.nav-button:pointerover">
+            <Setter Property="Background" Value="#2563eb"/>
+        </Style>
+    </Window.Styles>
 
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar Navigation -->
+        <Border Grid.Column="0"
+                Background="#1e293b"
+                BorderBrush="#334155"
+                BorderThickness="0,0,1,0">
+            <StackPanel Margin="0,20,0,0">
+                <!-- Application Title -->
+                <TextBlock Text="AI Code Agent"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           Margin="20,0,20,10"/>
+                <TextBlock Text="Builder"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Foreground="#60a5fa"
+                           Margin="20,0,20,30"/>
+
+                <!-- Navigation Buttons -->
+                <Button Classes="nav-button"
+                        Command="{Binding NavigateToHomeCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🏠" FontSize="16" Margin="0,0,10,0"/>
+                        <TextBlock Text="Home" Foreground="White" FontSize="14"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Classes="nav-button"
+                        Command="{Binding NavigateToCategoriesCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📦" FontSize="16" Margin="0,0,10,0"/>
+                        <TextBlock Text="Categories &amp; Stacks" Foreground="White" FontSize="14"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Classes="nav-button"
+                        Command="{Binding NavigateToProjectBuilderCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🚀" FontSize="16" Margin="0,0,10,0"/>
+                        <TextBlock Text="Project Builder" Foreground="White" FontSize="14"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Classes="nav-button"
+                        Command="{Binding NavigateToHistoryCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📜" FontSize="16" Margin="0,0,10,0"/>
+                        <TextBlock Text="AI History" Foreground="White" FontSize="14"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <!-- Content Region -->
+        <Border Grid.Column="1" Background="#f8fafc">
+            <ContentControl Content="{Binding CurrentView}">
+                <ContentControl.DataTemplates>
+                    <!-- Home View -->
+                    <DataTemplate DataType="vm:HomeViewModel">
+                        <views:HomeView />
+                    </DataTemplate>
+
+                    <!-- Category Management View -->
+                    <DataTemplate DataType="vm:CategoryManagementViewModel">
+                        <views:CategoryManagementView />
+                    </DataTemplate>
+
+                    <!-- Project Builder View -->
+                    <DataTemplate DataType="vm:ProjectBuilderViewModel">
+                        <views:ProjectBuilderView />
+                    </DataTemplate>
+
+                    <!-- History View -->
+                    <DataTemplate DataType="vm:HistoryViewModel">
+                        <views:HistoryView />
+                    </DataTemplate>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+        </Border>
+    </Grid>
 </Window>
+

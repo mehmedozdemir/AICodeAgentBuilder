@@ -1,3 +1,4 @@
+using AI.CodeAgent.Builder.Application.Services;
 using AI.CodeAgent.Builder.Application.Services.AIGeneration;
 using AI.CodeAgent.Builder.Application.Services.ArtifactGeneration;
 using AI.CodeAgent.Builder.Application.Services.Categories;
@@ -19,12 +20,12 @@ public static class DependencyInjection
     /// </summary>
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Register application services
-        services.AddScoped<CategoryService>();
-        services.AddScoped<TechStackService>();
-        services.AddScoped<ProjectProfileService>();
-        services.AddScoped<AIGenerationService>();
-        services.AddScoped<ArtifactGenerationService>();
+        // Register application services (existing implementation - in subdirectories)
+        services.AddScoped<Services.Categories.CategoryService>();
+        services.AddScoped<Services.TechStacks.TechStackService>();
+        services.AddScoped<Services.ProjectProfiles.ProjectProfileService>();
+        services.AddScoped<Services.AIGeneration.AIGenerationService>();
+        services.AddScoped<Services.ArtifactGeneration.ArtifactGenerationService>();
 
         // Future enhancements:
         // - Add MediatR for CQRS pattern

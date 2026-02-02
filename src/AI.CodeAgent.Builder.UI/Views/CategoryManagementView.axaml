@@ -1,0 +1,265 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AI.CodeAgent.Builder.UI.ViewModels"
+             x:Class="AI.CodeAgent.Builder.UI.Views.CategoryManagementView"
+             x:DataType="vm:CategoryManagementViewModel">
+
+    <Design.DataContext>
+        <vm:CategoryManagementViewModel />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="Button.action-button">
+            <Setter Property="Background" Value="#2563eb"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.action-button:pointerover">
+            <Setter Property="Background" Value="#1d4ed8"/>
+        </Style>
+        <Style Selector="Button.action-button:disabled">
+            <Setter Property="Background" Value="#94a3b8"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <Style Selector="Button.danger-button">
+            <Setter Property="Background" Value="#dc2626"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.danger-button:pointerover">
+            <Setter Property="Background" Value="#b91c1c"/>
+        </Style>
+
+        <Style Selector="ListBox.data-list">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#e2e8f0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Categories &amp; Tech Stacks"
+                           FontSize="28"
+                           FontWeight="Bold"
+                           Foreground="#1e293b"/>
+                <TextBlock Text="Manage technology categories and stacks for project generation"
+                           FontSize="14"
+                           Foreground="#64748b"
+                           Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Classes="action-button"
+                        Command="{Binding AIRefreshCommand}"
+                        IsEnabled="{Binding !IsRefreshing}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🤖" Margin="0,0,8,0"/>
+                        <TextBlock Text="AI Refresh"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="action-button"
+                        Command="{Binding LoadDataCommand}"
+                        IsEnabled="{Binding !IsLoading}">
+                    <TextBlock Text="🔄 Reload"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Loading Indicator -->
+        <Border Grid.Row="1"
+                Background="#f1f5f9"
+                CornerRadius="8"
+                Padding="40"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsVisible="{Binding IsLoading}">
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock Text="⏳ Loading data..."
+                           FontSize="18"
+                           Foreground="#64748b"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Refreshing Indicator -->
+        <Border Grid.Row="1"
+                Background="#fffbeb"
+                BorderBrush="#fbbf24"
+                BorderThickness="2"
+                CornerRadius="8"
+                Padding="40"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsVisible="{Binding IsRefreshing}">
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock Text="🤖 AI is researching technologies..."
+                           FontSize="18"
+                           Foreground="#92400e"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
+                <TextBlock Text="This may take a few minutes"
+                           FontSize="14"
+                           Foreground="#92400e"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" IsVisible="{Binding !IsLoading}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Categories Panel -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Text="Categories"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="#1e293b"
+                           Margin="0,0,0,10"/>
+
+                <ListBox Grid.Row="1"
+                         Classes="data-list"
+                         ItemsSource="{Binding Categories}"
+                         SelectedItem="{Binding SelectedCategory}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="10">
+                                <TextBlock Text="{Binding Name}"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1e293b"/>
+                                <TextBlock Text="{Binding Description}"
+                                           FontSize="13"
+                                           Foreground="#64748b"
+                                           TextWrapping="Wrap"
+                                           Margin="0,5,0,0"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                    <Border Background="{Binding IsActive, Converter={StaticResource BoolToColorConverter}}"
+                                            CornerRadius="4"
+                                            Padding="6,2">
+                                        <TextBlock Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}"
+                                                   FontSize="11"
+                                                   Foreground="White"/>
+                                    </Border>
+                                    <TextBlock Text="{Binding DisplayOrder, StringFormat='Order: {0}'}"
+                                               FontSize="11"
+                                               Foreground="#64748b"
+                                               Margin="10,0,0,0"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button Classes="action-button"
+                            Command="{Binding AddCategoryCommand}"
+                            Content="➕ Add"/>
+                    <Button Classes="action-button"
+                            Command="{Binding EditCategoryCommand}"
+                            Content="✏️ Edit"/>
+                    <Button Classes="danger-button"
+                            Command="{Binding DeleteCategoryCommand}"
+                            Content="🗑️ Delete"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Tech Stacks Panel -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                    <TextBlock Text="Tech Stacks"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#1e293b"/>
+                    <TextBlock Text="{Binding SelectedCategory.Name, StringFormat='Category: {0}'}"
+                               FontSize="13"
+                               Foreground="#64748b"
+                               Margin="0,5,0,0"
+                               IsVisible="{Binding SelectedCategory, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                </StackPanel>
+
+                <ListBox Grid.Row="1"
+                         Classes="data-list"
+                         ItemsSource="{Binding TechStacks}"
+                         SelectedItem="{Binding SelectedTechStack}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="10">
+                                <TextBlock Text="{Binding Name}"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1e293b"/>
+                                <TextBlock Text="{Binding Description}"
+                                           FontSize="13"
+                                           Foreground="#64748b"
+                                           TextWrapping="Wrap"
+                                           Margin="0,5,0,0"/>
+                                <Border Background="{Binding IsActive, Converter={StaticResource BoolToColorConverter}}"
+                                        CornerRadius="4"
+                                        Padding="6,2"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,5,0,0">
+                                    <TextBlock Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}"
+                                               FontSize="11"
+                                               Foreground="White"/>
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button Classes="action-button"
+                            Command="{Binding AddTechStackCommand}"
+                            Content="➕ Add"/>
+                    <Button Classes="action-button"
+                            Command="{Binding EditTechStackCommand}"
+                            Content="✏️ Edit"/>
+                    <Button Classes="danger-button"
+                            Command="{Binding DeleteTechStackCommand}"
+                            Content="🗑️ Delete"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

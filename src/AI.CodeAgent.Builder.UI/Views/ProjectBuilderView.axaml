@@ -1,0 +1,346 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AI.CodeAgent.Builder.UI.ViewModels"
+             x:Class="AI.CodeAgent.Builder.UI.Views.ProjectBuilderView"
+             x:DataType="vm:ProjectBuilderViewModel">
+
+    <Design.DataContext>
+        <vm:ProjectBuilderViewModel />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="Button.wizard-button">
+            <Setter Property="Background" Value="#2563eb"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="MinWidth" Value="100"/>
+        </Style>
+        <Style Selector="Button.wizard-button:pointerover">
+            <Setter Property="Background" Value="#1d4ed8"/>
+        </Style>
+        <Style Selector="Button.wizard-button:disabled">
+            <Setter Property="Background" Value="#94a3b8"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <Style Selector="Button.cancel-button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#64748b"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="#cbd5e1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.cancel-button:pointerover">
+            <Setter Property="BorderBrush" Value="#94a3b8"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Project Builder Wizard"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       Foreground="#1e293b"/>
+            <TextBlock Text="Follow these steps to generate your AI code agent configuration"
+                       FontSize="14"
+                       Foreground="#64748b"
+                       Margin="0,5,0,0"/>
+        </StackPanel>
+
+        <!-- Progress Indicator -->
+        <Border Grid.Row="1"
+                Background="White"
+                BorderBrush="#e2e8f0"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20"
+                Margin="0,0,0,20">
+            <ItemsControl ItemsSource="{Binding Steps}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="10,0">
+                            <Border Width="30"
+                                    Height="30"
+                                    CornerRadius="15"
+                                    Background="#2563eb"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="{Binding StepNumber}"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="{Binding StepTitle}"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0"
+                                       Foreground="#1e293b"
+                                       FontSize="13"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <!-- Current Step Content -->
+        <Border Grid.Row="2"
+                Background="White"
+                BorderBrush="#e2e8f0"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="30">
+            <ScrollViewer>
+                <ContentControl Content="{Binding CurrentStep}">
+                    <ContentControl.DataTemplates>
+                        <!-- Step 1: Project Metadata -->
+                        <DataTemplate DataType="vm:ProjectMetadataViewModel">
+                            <StackPanel>
+                                <TextBlock Text="{Binding StepDescription}"
+                                           FontSize="14"
+                                           Foreground="#64748b"
+                                           Margin="0,0,0,20"/>
+
+                                <TextBlock Text="Project Name *"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,5"/>
+                                <TextBox Text="{Binding ProjectName}"
+                                         Watermark="Enter project name"
+                                         Margin="0,0,0,15"/>
+
+                                <TextBlock Text="Description"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,5"/>
+                                <TextBox Text="{Binding Description}"
+                                         Watermark="Enter project description (optional)"
+                                         AcceptsReturn="True"
+                                         Height="100"
+                                         Margin="0,0,0,15"/>
+
+                                <TextBlock Text="Target Platform *"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,5"/>
+                                <ComboBox SelectedItem="{Binding TargetPlatform}"
+                                          Margin="0,0,0,15">
+                                    <ComboBoxItem Content=".NET / C#"/>
+                                    <ComboBoxItem Content="Python"/>
+                                    <ComboBoxItem Content="JavaScript / TypeScript"/>
+                                    <ComboBoxItem Content="Java"/>
+                                    <ComboBoxItem Content="Go"/>
+                                    <ComboBoxItem Content="Rust"/>
+                                    <ComboBoxItem Content="Other"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </DataTemplate>
+
+                        <!-- Step 2: Stack Selection -->
+                        <DataTemplate DataType="vm:StackSelectionViewModel">
+                            <StackPanel>
+                                <TextBlock Text="{Binding StepDescription}"
+                                           FontSize="14"
+                                           Foreground="#64748b"
+                                           Margin="0,0,0,20"/>
+
+                                <ItemsControl ItemsSource="{Binding Categories}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#f8fafc"
+                                                    BorderBrush="#e2e8f0"
+                                                    BorderThickness="1"
+                                                    CornerRadius="6"
+                                                    Padding="15"
+                                                    Margin="0,0,0,15">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Category.Name}"
+                                                               FontSize="16"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="#1e293b"
+                                                               Margin="0,0,0,10"/>
+                                                    <ItemsControl ItemsSource="{Binding TechStacks}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <CheckBox IsChecked="{Binding IsSelected}"
+                                                                          Content="{Binding Stack.Name}"
+                                                                          Margin="0,5"/>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+
+                        <!-- Step 3: Stack Parameters -->
+                        <DataTemplate DataType="vm:StackParameterViewModel">
+                            <StackPanel>
+                                <TextBlock Text="{Binding StepDescription}"
+                                           FontSize="14"
+                                           Foreground="#64748b"
+                                           Margin="0,0,0,20"/>
+
+                                <ItemsControl ItemsSource="{Binding StackGroups}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#f8fafc"
+                                                    BorderBrush="#e2e8f0"
+                                                    BorderThickness="1"
+                                                    CornerRadius="6"
+                                                    Padding="15"
+                                                    Margin="0,0,0,15">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding StackName}"
+                                                               FontSize="16"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="#1e293b"
+                                                               Margin="0,0,0,10"/>
+                                                    <ItemsControl ItemsSource="{Binding Parameters}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel Margin="0,5">
+                                                                    <TextBlock FontWeight="SemiBold" Margin="0,0,0,5"
+                                                                               Text="{Binding DisplayName}"/>
+                                                                    <TextBox Text="{Binding Value}"
+                                                                             Watermark="{Binding Description}"/>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+
+                        <!-- Step 4: Architecture &amp; Rules -->
+                        <DataTemplate DataType="vm:ArchitectureRulesViewModel">
+                            <StackPanel>
+                                <TextBlock Text="{Binding StepDescription}"
+                                           FontSize="14"
+                                           Foreground="#64748b"
+                                           Margin="0,0,0,20"/>
+
+                                <TextBlock Text="Architecture Pattern *"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,5"/>
+                                <ComboBox ItemsSource="{Binding AvailableArchitectures}"
+                                          SelectedItem="{Binding SelectedArchitecture}"
+                                          Margin="0,0,0,20"/>
+
+                                <TextBlock Text="Engineering Rules"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,10"/>
+                                <ItemsControl ItemsSource="{Binding AvailableRules}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsSelected}"
+                                                      Margin="0,5">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Rule.Name}"
+                                                               FontWeight="SemiBold"/>
+                                                    <TextBlock Text="{Binding Rule.Description}"
+                                                               FontSize="12"
+                                                               Foreground="#64748b"
+                                                               TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </CheckBox>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+
+                        <!-- Step 5: Preview & Generate -->
+                        <DataTemplate DataType="vm:PreviewGenerateViewModel">
+                            <StackPanel>
+                                <TextBlock Text="{Binding StepDescription}"
+                                           FontSize="14"
+                                           Foreground="#64748b"
+                                           Margin="0,0,0,20"/>
+
+                                <Border Background="#f8fafc"
+                                        BorderBrush="#e2e8f0"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="20">
+                                    <TextBox Text="{Binding PreviewText}"
+                                             IsReadOnly="True"
+                                             AcceptsReturn="True"
+                                             TextWrapping="Wrap"
+                                             FontFamily="Consolas,Courier New,monospace"
+                                             FontSize="12"
+                                             MinHeight="400"/>
+                                </Border>
+
+                                <Border Background="#fffbeb"
+                                        BorderBrush="#fbbf24"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="15"
+                                        Margin="0,20,0,0"
+                                        IsVisible="{Binding IsGenerating}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="⏳"
+                                                   FontSize="16"
+                                                   Margin="0,0,10,0"/>
+                                        <TextBlock Text="Generating artifacts... This may take a moment."
+                                                   FontSize="14"
+                                                   Foreground="#92400e"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Navigation Buttons -->
+        <Border Grid.Row="3"
+                Background="White"
+                BorderBrush="#e2e8f0"
+                BorderThickness="0,1,0,0"
+                Padding="0,20,0,0"
+                Margin="0,20,0,0">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Classes="cancel-button"
+                            Command="{Binding CancelCommand}"
+                            Content="Cancel"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Classes="wizard-button"
+                            Command="{Binding BackCommand}"
+                            Content="← Back"/>
+                    <Button Classes="wizard-button"
+                            Command="{Binding NextCommand}"
+                            Content="{Binding NextButtonText}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
