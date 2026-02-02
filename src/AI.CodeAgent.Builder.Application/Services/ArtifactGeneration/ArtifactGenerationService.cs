@@ -59,7 +59,7 @@ public sealed class ArtifactGenerationService
 
             // Load related entities
             var techStacks = new List<TechStack>();
-            foreach (var pts in profile.SelectedTechStacks)
+            foreach (var pts in profile.TechStacks)
             {
                 var techStack = await _techStackRepository.GetWithParametersAsync(pts.TechStackId, cancellationToken);
                 if (techStack != null)
@@ -67,7 +67,7 @@ public sealed class ArtifactGenerationService
             }
 
             var patterns = new List<ArchitecturePattern>();
-            foreach (var patternId in profile.SelectedArchitecturePatternIds)
+            foreach (var patternId in profile.ArchitecturePatternIds)
             {
                 var pattern = await _patternRepository.GetByIdAsync(patternId, cancellationToken);
                 if (pattern != null)
@@ -75,7 +75,7 @@ public sealed class ArtifactGenerationService
             }
 
             var rules = new List<EngineeringRule>();
-            foreach (var ruleId in profile.SelectedEngineeringRuleIds)
+            foreach (var ruleId in profile.EngineeringRuleIds)
             {
                 var rule = await _ruleRepository.GetByIdAsync(ruleId, cancellationToken);
                 if (rule != null)
@@ -92,9 +92,9 @@ public sealed class ArtifactGenerationService
                 {
                     ts.Name,
                     ts.Description,
-                    ts.DefaultVersion,
+                    Version = ts.DefaultVersion?.ToString(),
                     ts.DocumentationUrl,
-                    Parameters = profile.SelectedTechStacks
+                    Parameters = profile.TechStacks
                         .FirstOrDefault(pts => pts.TechStackId == ts.Id)?
                         .ParameterValues.Select(kvp => new
                         {
@@ -107,7 +107,7 @@ public sealed class ArtifactGenerationService
                     p.Name,
                     p.Description,
                     p.ComplexityLevel,
-                    p.ImplementationGuidelines
+                    Guidelines = p.Guidelines
                 }),
                 EngineeringRules = rules.Select(r => new
                 {
@@ -133,7 +133,7 @@ public sealed class ArtifactGenerationService
                 GeneratedAt = DateTime.UtcNow
             };
 
-            return Result<GeneratedArtifact>.SuccessResult(artifact);
+            return Result<GeneratedArtifact>.Success(artifact);
         }
         catch (Exception ex)
         {
@@ -165,7 +165,7 @@ public sealed class ArtifactGenerationService
 
             // Load tech stacks
             var techStacks = new List<TechStack>();
-            foreach (var pts in profile.SelectedTechStacks)
+            foreach (var pts in profile.TechStacks)
             {
                 var techStack = await _techStackRepository.GetWithParametersAsync(pts.TechStackId, cancellationToken);
                 if (techStack != null)
@@ -184,15 +184,15 @@ public sealed class ArtifactGenerationService
                 TechStacks = techStacks.Select(ts => new
                 {
                     Name = ts.Name,
-                    Version = ts.DefaultVersion,
-                    Configuration = profile.SelectedTechStacks
+                    Version = ts.DefaultVersion?.ToString(),
+                    Configuration = profile.TechStacks
                         .FirstOrDefault(pts => pts.TechStackId == ts.Id)?
                         .ParameterValues.ToDictionary(
                             kvp => kvp.Key,
                             kvp => kvp.Value.Value)
                 }),
-                Patterns = profile.SelectedArchitecturePatternIds.ToList(),
-                Rules = profile.SelectedEngineeringRuleIds.ToList(),
+                Patterns = profile.ArchitecturePatternIds.ToList(),
+                Rules = profile.EngineeringRuleIds.ToList(),
                 GeneratedAt = DateTime.UtcNow
             };
 
@@ -222,7 +222,7 @@ public sealed class ArtifactGenerationService
                 GeneratedAt = DateTime.UtcNow
             };
 
-            return Result<GeneratedArtifact>.SuccessResult(artifact);
+            return Result<GeneratedArtifact>.Success(artifact);
         }
         catch (Exception ex)
         {
@@ -264,7 +264,7 @@ public sealed class ArtifactGenerationService
 
             // Load engineering rules
             var rules = new List<EngineeringRule>();
-            foreach (var ruleId in profile.SelectedEngineeringRuleIds)
+            foreach (var ruleId in profile.EngineeringRuleIds)
             {
                 var rule = await _ruleRepository.GetByIdAsync(ruleId, cancellationToken);
                 if (rule != null)
@@ -321,7 +321,7 @@ public sealed class ArtifactGenerationService
 
             // Generate README template
             var techStacks = new List<TechStack>();
-            foreach (var pts in profile.SelectedTechStacks)
+            foreach (var pts in profile.TechStacks)
             {
                 var techStack = await _techStackRepository.GetWithParametersAsync(pts.TechStackId, cancellationToken);
                 if (techStack != null)
@@ -329,7 +329,7 @@ public sealed class ArtifactGenerationService
             }
 
             var patterns = new List<ArchitecturePattern>();
-            foreach (var patternId in profile.SelectedArchitecturePatternIds)
+            foreach (var patternId in profile.ArchitecturePatternIds)
             {
                 var pattern = await _patternRepository.GetByIdAsync(patternId, cancellationToken);
                 if (pattern != null)
@@ -343,7 +343,7 @@ public sealed class ArtifactGenerationService
                 TechStacks = techStacks.Select(ts => new
                 {
                     ts.Name,
-                    ts.DefaultVersion,
+                    Version = ts.DefaultVersion?.ToString(),
                     ts.DocumentationUrl
                 }),
                 ArchitecturePatterns = patterns.Select(p => new
@@ -363,7 +363,7 @@ public sealed class ArtifactGenerationService
                 GeneratedAt = DateTime.UtcNow
             });
 
-            return Result<ArtifactGenerationResult>.SuccessResult(result);
+            return Result<ArtifactGenerationResult>.Success(result);
         }
         catch (Exception ex)
         {

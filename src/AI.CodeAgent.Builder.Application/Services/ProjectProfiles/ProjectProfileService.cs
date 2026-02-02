@@ -55,7 +55,7 @@ public sealed class ProjectProfileService
             // Map to DTO
             var dto = MapToDto(profile);
 
-            return Result<ProjectProfileDto>.SuccessResult(dto);
+            return Result<ProjectProfileDto>.Success(dto);
         }
         catch (DomainException ex)
         {
@@ -94,13 +94,13 @@ public sealed class ProjectProfileService
                 profile.SetTargetTeamSize(command.TargetTeamSize.Value);
 
             // Persist
-            _profileRepository.Update(profile);
+            await _profileRepository.UpdateAsync(profile, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Map to DTO
             var dto = MapToDto(profile);
 
-            return Result<ProjectProfileDto>.SuccessResult(dto);
+            return Result<ProjectProfileDto>.Success(dto);
         }
         catch (DomainException ex)
         {
@@ -189,13 +189,13 @@ public sealed class ProjectProfileService
             profile.AddTechStack(command.TechStackId, paramValues);
 
             // Persist
-            _profileRepository.Update(profile);
+            await _profileRepository.UpdateAsync(profile, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Map to DTO
             var dto = MapToDto(profile);
 
-            return Result<ProjectProfileDto>.SuccessResult(dto);
+            return Result<ProjectProfileDto>.Success(dto);
         }
         catch (DomainException ex)
         {
@@ -234,13 +234,13 @@ public sealed class ProjectProfileService
             profile.AddArchitecturePattern(command.PatternId);
 
             // Persist
-            _profileRepository.Update(profile);
+            await _profileRepository.UpdateAsync(profile, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Map to DTO
             var dto = MapToDto(profile);
 
-            return Result<ProjectProfileDto>.SuccessResult(dto);
+            return Result<ProjectProfileDto>.Success(dto);
         }
         catch (DomainException ex)
         {
@@ -279,13 +279,13 @@ public sealed class ProjectProfileService
             profile.AddEngineeringRule(command.RuleId);
 
             // Persist
-            _profileRepository.Update(profile);
+            await _profileRepository.UpdateAsync(profile, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Map to DTO
             var dto = MapToDto(profile);
 
-            return Result<ProjectProfileDto>.SuccessResult(dto);
+            return Result<ProjectProfileDto>.Success(dto);
         }
         catch (DomainException ex)
         {
@@ -314,7 +314,7 @@ public sealed class ProjectProfileService
 
             var dto = MapToDto(profile);
 
-            return Result<ProjectProfileDto>.SuccessResult(dto);
+            return Result<ProjectProfileDto>.Success(dto);
         }
         catch (Exception ex)
         {
@@ -334,7 +334,7 @@ public sealed class ProjectProfileService
             var profiles = await _profileRepository.GetAllProfilesAsync(cancellationToken);
             var dtos = profiles.Select(MapToDto).ToList();
 
-            return Result<IEnumerable<ProjectProfileDto>>.SuccessResult(dtos);
+            return Result<IEnumerable<ProjectProfileDto>>.Success(dtos);
         }
         catch (Exception ex)
         {
@@ -366,7 +366,7 @@ public sealed class ProjectProfileService
                     "and all required parameters are provided.");
             }
 
-            return Result<bool>.SuccessResult(true);
+            return Result<bool>.Success(true);
         }
         catch (Exception ex)
         {
@@ -385,7 +385,7 @@ public sealed class ProjectProfileService
             Description = profile.Description,
             ProjectName = profile.ProjectName,
             TargetTeamSize = profile.TargetTeamSize,
-            TechStacks = profile.SelectedTechStacks.Select(pts => new ProfileTechStackDto
+            TechStacks = profile.TechStacks.Select(pts => new ProfileTechStackDto
             {
                 TechStackId = pts.TechStackId,
                 TechStackName = pts.TechStackId.ToString(), // Will be enriched by UI layer
@@ -393,11 +393,11 @@ public sealed class ProjectProfileService
                     kvp => kvp.Key,
                     kvp => kvp.Value.Value)
             }).ToList(),
-            ArchitecturePatternIds = profile.SelectedArchitecturePatternIds.ToList(),
-            EngineeringRuleIds = profile.SelectedEngineeringRuleIds.ToList(),
+            ArchitecturePatternIds = profile.ArchitecturePatternIds.ToList(),
+            EngineeringRuleIds = profile.EngineeringRuleIds.ToList(),
             IsValid = profile.IsValid(),
             CreatedAt = profile.CreatedAt,
-            UpdatedAt = profile.UpdatedAt
+            UpdatedAt = profile.UpdatedAt ?? profile.CreatedAt
         };
     }
 

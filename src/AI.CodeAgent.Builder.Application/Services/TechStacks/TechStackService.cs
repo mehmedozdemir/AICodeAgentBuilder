@@ -77,7 +77,7 @@ public sealed class TechStackService
             // Map to DTO
             var dto = MapToDto(techStack, category.Name);
 
-            return Result<TechStackDto>.SuccessResult(dto);
+            return Result<TechStackDto>.Success(dto);
         }
         catch (DomainException ex)
         {
@@ -133,13 +133,13 @@ public sealed class TechStackService
                 techStack.SetDocumentationUrl(command.DocumentationUrl);
 
             // Persist
-            _techStackRepository.Update(techStack);
+            await _techStackRepository.UpdateAsync(techStack, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Map to DTO
             var dto = MapToDto(techStack, category.Name);
 
-            return Result<TechStackDto>.SuccessResult(dto);
+            return Result<TechStackDto>.Success(dto);
         }
         catch (DomainException ex)
         {
@@ -179,16 +179,14 @@ public sealed class TechStackService
             if (!string.IsNullOrWhiteSpace(command.DefaultValue))
                 parameter.SetDefaultValue(command.DefaultValue);
 
-            foreach (var allowedValue in command.AllowedValues)
-            {
-                parameter.AddAllowedValue(allowedValue);
-            }
+            if (command.AllowedValues.Any())
+                parameter.SetAllowedValues(command.AllowedValues.ToArray());
 
             // Add to tech stack
             techStack.AddParameter(parameter);
 
             // Persist
-            _techStackRepository.Update(techStack);
+            await _techStackRepository.UpdateAsync(techStack, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Get category name
@@ -198,7 +196,7 @@ public sealed class TechStackService
             // Map to DTO
             var dto = MapToDto(techStack, categoryName);
 
-            return Result<TechStackDto>.SuccessResult(dto);
+            return Result<TechStackDto>.Success(dto);
         }
         catch (DomainException ex)
         {
@@ -236,10 +234,10 @@ public sealed class TechStackService
             }
 
             // Delete
-            _techStackRepository.Remove(techStack);
+            await _techStackRepository.DeleteAsync(techStack.Id, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result.SuccessResult();
+            return Result.Success();
         }
         catch (Exception ex)
         {
@@ -269,7 +267,7 @@ public sealed class TechStackService
             // Map to DTOs
             var dtos = techStacks.Select(ts => MapToDto(ts, category.Name)).ToList();
 
-            return Result<IEnumerable<TechStackDto>>.SuccessResult(dtos);
+            return Result<IEnumerable<TechStackDto>>.Success(dtos);
         }
         catch (Exception ex)
         {
@@ -298,7 +296,7 @@ public sealed class TechStackService
 
             var dto = MapToDto(techStack, categoryName);
 
-            return Result<TechStackDto>.SuccessResult(dto);
+            return Result<TechStackDto>.Success(dto);
         }
         catch (Exception ex)
         {
@@ -317,9 +315,8 @@ public sealed class TechStackService
             CategoryName = categoryName,
             Name = techStack.Name,
             Description = techStack.Description,
-            DefaultVersion = techStack.DefaultVersion,
+            DefaultVersion = techStack.DefaultVersion?.ToString(),
             DocumentationUrl = techStack.DocumentationUrl,
-            PopularityScore = techStack.PopularityScore,
             Parameters = techStack.Parameters.Select(p => new StackParameterDto
             {
                 Id = p.Id,
@@ -331,7 +328,7 @@ public sealed class TechStackService
                 AllowedValues = p.AllowedValues.ToList()
             }).ToList(),
             CreatedAt = techStack.CreatedAt,
-            UpdatedAt = techStack.UpdatedAt
+            UpdatedAt = techStack.UpdatedAt ?? techStack.CreatedAt
         };
     }
 

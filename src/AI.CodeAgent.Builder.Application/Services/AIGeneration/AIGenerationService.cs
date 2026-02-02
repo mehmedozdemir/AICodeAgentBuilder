@@ -105,7 +105,7 @@ public sealed class AIGenerationService
                     IsAIGenerated = category.IsAIGenerated,
                     TechStackCount = 0,
                     CreatedAt = category.CreatedAt,
-                    UpdatedAt = category.UpdatedAt
+                    UpdatedAt = category.UpdatedAt ?? category.CreatedAt
                 });
             }
 
@@ -114,7 +114,7 @@ public sealed class AIGenerationService
             // Mark AI response as validated
             await MarkAIResponseAsValidatedAsync(aiResponseEntity, "System", cancellationToken);
 
-            return Result<IEnumerable<CategoryDto>>.SuccessResult(createdCategories);
+            return Result<IEnumerable<CategoryDto>>.Success(createdCategories);
         }
         catch (Exception ex)
         {
@@ -205,10 +205,8 @@ public sealed class AIGenerationService
                     if (!string.IsNullOrWhiteSpace(genParam.DefaultValue))
                         parameter.SetDefaultValue(genParam.DefaultValue);
 
-                    foreach (var allowedValue in genParam.AllowedValues)
-                    {
-                        parameter.AddAllowedValue(allowedValue);
-                    }
+                    if (genParam.AllowedValues.Any())
+                        parameter.SetAllowedValues(genParam.AllowedValues.ToArray());
 
                     techStack.AddParameter(parameter);
                 }
@@ -222,9 +220,8 @@ public sealed class AIGenerationService
                     CategoryName = category.Name,
                     Name = techStack.Name,
                     Description = techStack.Description,
-                    DefaultVersion = techStack.DefaultVersion,
+                    DefaultVersion = techStack.DefaultVersion?.ToString(),
                     DocumentationUrl = techStack.DocumentationUrl,
-                    PopularityScore = techStack.PopularityScore,
                     Parameters = techStack.Parameters.Select(p => new StackParameterDto
                     {
                         Id = p.Id,
@@ -236,7 +233,7 @@ public sealed class AIGenerationService
                         AllowedValues = p.AllowedValues.ToList()
                     }).ToList(),
                     CreatedAt = techStack.CreatedAt,
-                    UpdatedAt = techStack.UpdatedAt
+                    UpdatedAt = techStack.UpdatedAt ?? techStack.CreatedAt
                 });
             }
 
@@ -245,7 +242,7 @@ public sealed class AIGenerationService
             // Mark AI response as validated
             await MarkAIResponseAsValidatedAsync(aiResponseEntity, "System", cancellationToken);
 
-            return Result<IEnumerable<TechStackDto>>.SuccessResult(createdStacks);
+            return Result<IEnumerable<TechStackDto>>.Success(createdStacks);
         }
         catch (Exception ex)
         {
@@ -321,15 +318,13 @@ public sealed class AIGenerationService
                 if (!string.IsNullOrWhiteSpace(genParam.DefaultValue))
                     parameter.SetDefaultValue(genParam.DefaultValue);
 
-                foreach (var allowedValue in genParam.AllowedValues)
-                {
-                    parameter.AddAllowedValue(allowedValue);
-                }
+                if (genParam.AllowedValues.Any())
+                    parameter.SetAllowedValues(genParam.AllowedValues.ToArray());
 
                 techStack.AddParameter(parameter);
             }
 
-            _techStackRepository.Update(techStack);
+            await _techStackRepository.UpdateAsync(techStack, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Mark AI response as validated
@@ -346,9 +341,8 @@ public sealed class AIGenerationService
                 CategoryName = categoryName,
                 Name = techStack.Name,
                 Description = techStack.Description,
-                DefaultVersion = techStack.DefaultVersion,
+                DefaultVersion = techStack.DefaultVersion?.ToString(),
                 DocumentationUrl = techStack.DocumentationUrl,
-                PopularityScore = techStack.PopularityScore,
                 Parameters = techStack.Parameters.Select(p => new StackParameterDto
                 {
                     Id = p.Id,
@@ -360,10 +354,10 @@ public sealed class AIGenerationService
                     AllowedValues = p.AllowedValues.ToList()
                 }).ToList(),
                 CreatedAt = techStack.CreatedAt,
-                UpdatedAt = techStack.UpdatedAt
+                UpdatedAt = techStack.UpdatedAt ?? techStack.CreatedAt
             };
 
-            return Result<TechStackDto>.SuccessResult(dto);
+            return Result<TechStackDto>.Success(dto);
         }
         catch (Exception ex)
         {
@@ -523,11 +517,11 @@ Requirements:
         var entity = AIResponse.Create(prompt, aiResponse.Content, context);
 
         if (aiResponse.PromptTokens.HasValue)
-            entity.SetTokenUsage(aiResponse.PromptTokens.Value, aiResponse.CompletionTokens ?? 0);
+            entity.SetPerformanceMetrics(aiResponse.PromptTokens.Value + (aiResponse.CompletionTokens ?? 0), null);
 
         if (!aiResponse.IsSuccess && !string.IsNullOrWhiteSpace(aiResponse.ErrorMessage))
         {
-            entity.MarkAsRejected(aiResponse.ErrorMessage);
+            entity.MarkAsRejected(aiResponse.ErrorMessage, "AI Provider");
         }
 
         await _aiResponseRepository.AddAsync(entity, cancellationToken);
@@ -542,7 +536,7 @@ Requirements:
         CancellationToken cancellationToken)
     {
         aiResponse.MarkAsValidated(validatorName);
-        _aiResponseRepository.Update(aiResponse);
+        await _aiResponseRepository.UpdateAsync(aiResponse, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
@@ -551,8 +545,8 @@ Requirements:
         string reason,
         CancellationToken cancellationToken)
     {
-        aiResponse.MarkAsRejected(reason);
-        _aiResponseRepository.Update(aiResponse);
+        aiResponse.MarkAsRejected(reason, "System");
+        await _aiResponseRepository.UpdateAsync(aiResponse, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

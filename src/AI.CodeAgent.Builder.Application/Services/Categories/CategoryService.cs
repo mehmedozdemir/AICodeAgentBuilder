@@ -55,7 +55,7 @@ public sealed class CategoryService
             // Map to DTO
             var dto = MapToDto(category);
 
-            return Result<CategoryDto>.SuccessResult(dto);
+            return Result<CategoryDto>.Success(dto);
         }
         catch (DomainException ex)
         {
@@ -98,13 +98,13 @@ public sealed class CategoryService
             category.SetDescription(command.Description);
 
             // Persist
-            _categoryRepository.Update(category);
+            await _categoryRepository.UpdateAsync(category, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Map to DTO
             var dto = MapToDto(category);
 
-            return Result<CategoryDto>.SuccessResult(dto);
+            return Result<CategoryDto>.Success(dto);
         }
         catch (DomainException ex)
         {
@@ -144,10 +144,10 @@ public sealed class CategoryService
             category.Deactivate();
 
             // Persist
-            _categoryRepository.Update(category);
+            await _categoryRepository.UpdateAsync(category, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result.SuccessResult();
+            return Result.Success();
         }
         catch (Exception ex)
         {
@@ -186,7 +186,7 @@ public sealed class CategoryService
                 dtos.Add(dto);
             }
 
-            return Result<IEnumerable<CategoryDto>>.SuccessResult(dtos);
+            return Result<IEnumerable<CategoryDto>>.Success(dtos);
         }
         catch (Exception ex)
         {
@@ -212,7 +212,7 @@ public sealed class CategoryService
             var techStacks = await _techStackRepository.GetByCategoryIdAsync(category.Id, cancellationToken);
             var dto = MapToDto(category, techStacks.Count());
 
-            return Result<CategoryDto>.SuccessResult(dto);
+            return Result<CategoryDto>.Success(dto);
         }
         catch (Exception ex)
         {
@@ -233,7 +233,7 @@ public sealed class CategoryService
             IsAIGenerated = category.IsAIGenerated,
             TechStackCount = techStackCount,
             CreatedAt = category.CreatedAt,
-            UpdatedAt = category.UpdatedAt
+            UpdatedAt = category.UpdatedAt ?? category.CreatedAt
         };
     }
 
