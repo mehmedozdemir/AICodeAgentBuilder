@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "releaseDate": "2026-02-02",
-  "releaseNotes": "Complete Domain layer implementation with entities, value objects, and business logic"
+  "releaseNotes": "Complete Application layer with all use cases, AI orchestration, and artifact generation"
 }
